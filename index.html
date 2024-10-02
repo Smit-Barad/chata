@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        #messages {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        #messages div {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 4px;
+            background-color: #e1f5fe;
+        }
+        #messageInput {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        #sendMessage {
+            padding: 10px 20px;
+            background-color: #0277bd;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #sendMessage:hover {
+            background-color: #01579b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Chat App</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type your message here...">
+    <button id="sendMessage">Send</button>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:3000');
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageButton = document.getElementById('sendMessage');
+
+        ws.onopen = () => {
+            console.log('WebSocket connection established');
+        };
+
+        ws.onmessage = (event) => {
+            const message = document.createElement('div');
+            message.textContent = event.data;
+            messagesDiv.appendChild(message);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;  // Auto scroll to the bottom
+        };
+
+        sendMessageButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message) {
+                ws.send(message);
+                messageInput.value = '';
+            }
+        });
+         // **Add the Enter key functionality here**
+         messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessageButton.click(); // Trigger the send button
+            }
+        });
+    </script>
+</body>
+</html>
